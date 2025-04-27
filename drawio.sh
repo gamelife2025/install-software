@@ -2,7 +2,7 @@
 
 SHELL_FOLDER=$(cd $(dirname ${BASH_SOURCE[0]});pwd)
 
-VERSION="v26.2.2"
+VERSION="v26.2.15"
 
 if [ -n "$1" ];then VERSION=$1; fi
 
