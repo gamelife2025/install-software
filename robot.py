@@ -12,6 +12,21 @@ class Robot(object):
         self.changed = {}
         self.repo = Repo()
 
+    def _get_with_retry(self, url: str, *, timeout: int | None = None, follow_redirects: bool = False, retries: int = 2):
+        request_timeout = timeout if timeout is not None else httpx_timeout
+        for attempt in range(retries + 1):
+            try:
+                return httpx.get(url, timeout=request_timeout, follow_redirects=follow_redirects)
+            except httpx.TimeoutException:
+                if attempt < retries:
+                    print(f"请求超时，正在重试 {attempt + 1}/{retries}: {url}")
+                    continue
+                print(f"请求超时，已重试 {retries} 次失败: {url}")
+                return None
+            except Exception as exc:
+                print(f"请求失败: {url} ({exc})")
+                return None
+
     def start(self):
         for key in self.__class__.__dict__.keys():
             if key.startswith('_') or key in ['start']:
@@ -38,7 +53,9 @@ class Robot(object):
             self._change_version_tag_github(f,"jgraph/drawio-desktop")
 
     def firefox(self):
-        ack = httpx.get("https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=zh-CN", follow_redirects=False)
+        ack = self._get_with_retry("https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=zh-CN", follow_redirects=False)
+        if ack is None:
+            return
         if ack.status_code == 302:
             real_download_url = ack.headers.get('Location')
             match = re.search(r'.*firefox-(.*)\.tar.*',real_download_url)
@@ -67,10 +84,9 @@ class Robot(object):
             self._change_version_tag_github(f,"cli/cli")
 
     def go(self):
-        try:
-            ack = httpx.get('https://go.dev/dl/', timeout=httpx_timeout)
-        except httpx.TimeoutException:
-            print(f"更新go失败,连接超时")
+        ack = self._get_with_retry('https://go.dev/dl/', timeout=httpx_timeout)
+        if ack is None:
+            print("更新go失败,连接超时")
             return
         if ack.status_code == 200:
             match = re.search(r'.*download downloadBox.*go(.*)\.linux-amd64.*gz"',ack.text)
@@ -119,7 +135,9 @@ class Robot(object):
             self._change_version_tag_github(f,"syncthing/syncthing")
 
     def vscode(self):
-        ack = httpx.get('https://code.visualstudio.com/sha/download?build=stable&os=linux-x64', follow_redirects=False)
+        ack = self._get_with_retry('https://code.visualstudio.com/sha/download?build=stable&os=linux-x64', follow_redirects=False)
+        if ack is None:
+            return
         if ack.status_code == 302:
             real_download_url = ack.headers.get('Location')
             real_download_url = real_download_url.replace("az764295.vo.msecnd.net/stable","vscode.cdn.azure.cn/stable")
@@ -177,16 +195,17 @@ class Robot(object):
             self._change_version_tag_github(f,"laurent22/joplin")
     
     def pycharm(self):
-        ack = httpx.get('https://data.services.jetbrains.com/products/releases?code=PCP&latest=true&type=release', follow_redirects=False)
+        ack = self._get_with_retry('https://data.services.jetbrains.com/products/releases?code=PCP&latest=true&type=release', follow_redirects=False)
+        if ack is None:
+            return
         version = ack.json()['PCP'][0]['version']
         with open('pycharm.sh', 'r+') as f:
             self._update_version(f, version=version)
     
     def qq(self):
-        try:
-            ack = httpx.get("https://cdn-go.cn/qq-web/im.qq.com_new/latest/rainbow/linuxQQDownload.js", timeout=httpx_timeout)
-        except Exception:
-            print(f"更新qq失败,连接超时")
+        ack = self._get_with_retry("https://cdn-go.cn/qq-web/im.qq.com_new/latest/rainbow/linuxQQDownload.js", timeout=httpx_timeout)
+        if ack is None:
+            print("更新qq失败,连接超时")
             return
         if ack.status_code == 200:
             pattern = re.compile(r'(https://dldir1.qq.com/qqfile/qq/QQNT/Linux/QQ_(\d+\.\d+\.\d+)_[0-9]{1,6}_x86_\d+_\d+\.AppImage)')
@@ -204,10 +223,9 @@ class Robot(object):
                 print(f"更新qq失败,没有提取到下载地址")
 
     def qqmusic(self):
-        try:
-            ack = httpx.get("https://y.qq.com/download/download.html")
-        except Exception:
-            print(f'更新qqmusic失败,连接超时')
+        ack = self._get_with_retry("https://y.qq.com/download/download.html")
+        if ack is None:
+            print('更新qqmusic失败,连接超时')
             return
         if ack.status_code == 200:
             match = re.search(r'https://dldir1.qq.com/music/clntupate/linux/AppImage/qqmusic-\d+\.\d+\.\d+.AppImage', ack.text)
@@ -244,7 +262,9 @@ class Robot(object):
 
     def _check_for_github_release(self,name:str) ->Tuple[str, bool]:
         url = 'https://api.github.com/repos/{name}/releases/latest'.format(name=name)
-        ack = httpx.get(url=url)
+        ack = self._get_with_retry(url=url, timeout=httpx_timeout)
+        if ack is None:
+            return "timeout", False
         if ack.status_code == 200:
             return ack.json()['tag_name'],True
         else:

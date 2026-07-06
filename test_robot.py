@@ -1,4 +1,8 @@
 import unittest
+from unittest.mock import patch
+
+import httpx
+
 from robot import Robot
 
 
@@ -78,3 +82,10 @@ class TestRobot(unittest.TestCase):
         self.assertFalse(self.robot._compare_verion("v3.5.4","v3.4.20"))
         self.assertFalse(self.robot._compare_verion("v17.9.1","v16.17.0"))
         self.assertFalse(self.robot._compare_verion("v1.2.3","v1.2.2.1"))
+
+    def test_get_with_retry_timeout(self):
+        with patch("robot.httpx.get", side_effect=httpx.TimeoutException("timeout")) as mock_get:
+            response = self.robot._get_with_retry("https://example.com", timeout=1)
+
+        self.assertIsNone(response)
+        self.assertEqual(mock_get.call_count, 3)
