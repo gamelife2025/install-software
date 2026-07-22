@@ -2,7 +2,7 @@
 
 SHELL_FOLDER=$(cd $(dirname ${BASH_SOURCE[0]});pwd)
 
-fileUrl="https://download-installer.cdn.mozilla.net/pub/firefox/releases/152.0.6/linux-x86_64/zh-CN/firefox-152.0.6.tar.xz"
+fileUrl="https://download-installer.cdn.mozilla.net/pub/firefox/releases/153.0/linux-x86_64/zh-CN/firefox-153.0.tar.xz"
 fileName="Firefox-latest-x86_64.tar.bz2"
 
 _main() {
