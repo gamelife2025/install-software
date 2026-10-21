@@ -268,7 +268,7 @@ class Robot(object):
         if ack.status_code == 200:
             return ack.json()['tag_name'],True
         else:
-            return f"code:{ack.status_code}, err:{ack.reason}",False
+            return f"code:{ack.status_code}, err:{ack.reason_phrase}",False
 
     def _update_file(self,f: TextIO, fileName, fileUrl):
         lines = f.readlines()
