@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="v0.168.0"
+VERSION="v0.169.0"
 
 if [ -n "$1" ];then
     VERSION=$1
