@@ -89,3 +89,14 @@ class TestRobot(unittest.TestCase):
 
         self.assertIsNone(response)
         self.assertEqual(mock_get.call_count, 3)
+
+    def test_check_for_github_release_error(self):
+        response = httpx.Response(
+            404,
+            request=httpx.Request("GET", "https://api.github.com/repos/example/project/releases/latest"),
+        )
+        with patch.object(self.robot, "_get_with_retry", return_value=response):
+            release, success = self.robot._check_for_github_release("example/project")
+
+        self.assertEqual(release, f"code:404, err:{response.reason_phrase}")
+        self.assertFalse(success)
