@@ -2,6 +2,12 @@
 
 一个 Go 编写的命令行安装工具：**安装时自动解析并下载软件的最新版本**，交付只需要一个二进制文件。
 
+## 支持平台
+
+- **操作系统**：仅支持 Linux（amd64）
+- **桌面应用**：已在 **Ubuntu**、**Manjaro**、**Linux Mint** 上验证
+- **CLI 工具**：适用于各主流 Linux 发行版
+
 ## 安装 install-software 自身
 
 从 [Releases](https://github.com/gamelife2025/install-software/releases/latest) 下载二进制：
