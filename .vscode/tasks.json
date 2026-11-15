@@ -1,0 +1,52 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "build",
+                "-o", "install-software",
+                "-ldflags", "-X main.version=dev-local",
+                "."
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$go"]
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "./..."],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": ["$go"]
+        },
+        {
+            "label": "test (含网络用例)",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "-v", "-run", "TestResolver", "./..."],
+            "options": {
+                "env": {
+                    "RUN_NETWORK_TESTS": "1"
+                }
+            },
+            "group": "test",
+            "problemMatcher": ["$go"]
+        },
+        {
+            "label": "vet",
+            "type": "shell",
+            "command": "go",
+            "args": ["vet", "./..."],
+            "problemMatcher": ["$go"]
+        }
+    ]
+}

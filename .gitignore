@@ -1,7 +1,3 @@
-.vscode
-.venv
-venv
 .idea
-__pycache__
-tmp/*
-!/tmp/.gitkeep
+install-software
+install-software-linux-amd64*

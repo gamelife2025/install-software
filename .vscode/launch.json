@@ -1,0 +1,68 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: help",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": ["help"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: install app (最新版)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": ["${input:appName}"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: install app (指定版本)",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": ["${input:appName}", "${input:appVersion}"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: upgrade",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": ["upgrade"],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: 当前文件的测试",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${fileDirname}",
+            "console": "integratedTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "appName",
+            "type": "pickString",
+            "description": "选择要安装的软件",
+            "options": [
+                "dbeaver", "drawio", "firefox", "sublime_text", "vscode",
+                "pycharm", "joplin", "qq", "qqmusic", "redisInsight", "hoppscotch",
+                "docker-compose", "etcd", "gh", "go", "hugo", "java",
+                "protoc", "syncthing", "upx", "vscode-cli", "nvm",
+                "list", "version"
+            ]
+        },
+        {
+            "id": "appVersion",
+            "type": "promptString",
+            "description": "指定版本，如 1.27.4 或 v0.170.0"
+        }
+    ]
+}
